@@ -2,7 +2,7 @@ require 'uri'
 
 module Spree
   CheckoutController.class_eval do
-    before_filter :redirect_to_kiala_locate_and_select_service_if_needed, :only => [:update]
+    #before_filter :redirect_to_kiala_locate_and_select_service_if_needed, :only => [:update]
 
     def redirect_to_kiala_locate_and_select_service_if_needed
       return unless (params[:state] == "address")
