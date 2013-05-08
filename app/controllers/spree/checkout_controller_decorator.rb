@@ -5,7 +5,7 @@ module Spree
     before_filter :redirect_to_kiala_locate_and_select_service_if_needed, :only => [:update]
 
     def redirect_to_kiala_locate_and_select_service_if_needed
-      return unless (params[:state] == "delivery")
+      return unless (params[:state] == "address")
       return unless params[:order][:shipping_method_id]
 
       if @order.update_attributes(object_params)
@@ -62,15 +62,15 @@ module Spree
       load_order
       kpoint = find_kp_by_order(@order)
       if kpoint.nil?
-        Spree::KialaPoint.create(:shortkpid => params[:shortkpid],
-                                 :order_id => @order.id,
-                                 :kpname => params[:kpname],
-                                 :street => params[:street],
-                                 :zip => params[:zip],
-                                 :city => params[:city],
-                                 :locationhint => params[:locationhint],
-                                 :openinghours => params[:openinghours],
-                                 :label => params[:label])
+        kpoint = Spree::KialaPoint.create( :shortkpid => params[:shortkpid],
+                                           :order_id => @order.id,
+                                           :kpname => params[:kpname],
+                                           :street => params[:street],
+                                           :zip => params[:zip],
+                                           :city => params[:city],
+                                           :locationhint => params[:locationhint],
+                                           :openinghours => params[:openinghours],
+                                           :label => params[:label])
       else
         kpoint.update_attributes(:shortkpid => params[:shortkpid],
                                  :kpname => params[:kpname],
@@ -81,7 +81,11 @@ module Spree
                                  :openinghours => params[:openinghours],
                                  :label => params[:label])
       end
-      redirect_to checkout_state_path(@order.checkout_steps.third)
+
+      @order.ship_address = Spree::Address.new_from_kiala_point(kpoint, @order.bill_address)
+      kiala_method = Spree::Calculator::Kiala.first.calculable
+      @order.update_attribute(:shipping_method_id, kiala_method.id)
+      redirect_to checkout_state_path('address')
     end
 
 

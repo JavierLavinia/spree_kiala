@@ -9,12 +9,18 @@ module Spree
     preference :upper_boundry,     :decimal, :default => 50.0
     preference :amount,            :decimal, :default => 5.0
 
-    attr_accessible attr_accessible :preferred_private_area_url, :preferred_tracking_url,
+    attr_accessible :preferred_private_area_url, :preferred_tracking_url,
                     :preferred_dspid, :preferred_kiala_service_url, :preferred_preparationdelay,
                     :preferred_lower_boundry, :preferred_upper_boundry, :preferred_amount
 
+    alias_method :amount, :preferred_amount
+
     def self.description
       I18n.t(:kiala_shipping)
+    end
+
+    def service_url(callback)
+      "#{preferred_kiala_service_url}?country=ES&language=es&dspid=#{preferred_dspid}&bckUrl=#{callback}&preparationdelay=#{preferred_preparationdelay}&target=_parent"
     end
 
     def compute(object)
@@ -26,5 +32,6 @@ module Spree
         return 0.0
       end
     end
+
   end
 end
