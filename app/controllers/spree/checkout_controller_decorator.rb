@@ -5,7 +5,7 @@ module Spree
     #before_filter :redirect_to_kiala_locate_and_select_service_if_needed, :only => [:update]
 
     def redirect_to_kiala_locate_and_select_service_if_needed
-      return unless (params[:state] == "address")
+      return unless (params[:state] == "delivery")
       return unless params[:order][:shipping_method_id]
 
       if @order.update_attributes(object_params)
@@ -85,7 +85,7 @@ module Spree
       @order.ship_address = Spree::Address.new_from_kiala_point(kpoint, @order.bill_address)
       kiala_method = Spree::Calculator::Kiala.first.calculable
       @order.update_attribute(:shipping_method_id, kiala_method.id)
-      redirect_to checkout_state_path('address')
+      redirect_to checkout_state_path('delivery')
     end
 
 
